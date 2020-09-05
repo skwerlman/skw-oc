@@ -13,7 +13,14 @@ local charts = require 'charts'
     mekanism
 ]]--
 
--- join lists of cells
+-- [[ SETTINGS ]] --
+
+local FG_COLOR = 0xFFFFFF
+local BG_COLOR = 0x000000
+
+-- [[ END SETTINGS ]] --
+
+-- combine tables, appending array section
 local function joinLists(lists)
     local joined = {}
     for _,list in ipairs(lists) do
@@ -28,6 +35,7 @@ local function joinLists(lists)
     return joined
 end
 
+-- calculate number of elements in a table
 local function tSize(t)
     local c = 0
     for _ in pairs(t) do
@@ -36,6 +44,7 @@ local function tSize(t)
     return c
 end
 
+-- build a proxied list of cell components
 local function getCells()
     local cells = joinLists({
         -- rf-based cells (te, eio, rs)
@@ -62,12 +71,52 @@ local function getCells()
     return proxiedCells
 end
 
+local function buildContainer(gpu)
+    local w, h = gpu.getResolution()
+    return charts.Container({
+        x = 0,
+        y = 0,
+        gpu = gpu,
+        fg = FG_COLOR,
+        bg = BG_COLOR,
+        width = w,
+        height = h,
+    })
+end
+
+local function buildHistogram(cells)
+    -- TODO maybe actually do some configuring in here?
+    local histogram = charts.Histogram()
+    histogram.sources = cells
+    return histogram
+end
+
+local function updateHistogram(histogram)
+    return histogram
+end
+
+local function loop(container)
+    container.payload = updateHistogram(container.payload)
+    -- container:draw()
+    print('loop')
+    event.timer(LOOP_DELAY, loop)
+end
+
+
 local function main()
     print('initializing...')
     local gpu = component.gpu
+    local screen = component.screen
     print('getting list of cells...')
     local cells = getCells()
     print('found '..tostring(tSize(cells))..' cells')
+    print('building container...')
+    local container = buildContainer(gpu, screen)
+    print('building histogram...')
+    container.payload = buildHistogram()
+    print('starting main loop...')
+    loop(container)
+    -- while true do end
 end
 
 main()
