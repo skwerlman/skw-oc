@@ -93,13 +93,24 @@ local function buildHistogram(cells)
 end
 
 local function updateHistogram(histogram)
+    local max, cur = 0, 0
+    for _,src in ipairs(histogram.sources) do
+        local t = src.type
+        if t == 'energy_device' or t == 'basic_energy_cube' then
+            max = max + src.getMaxEnergyStored()
+            cur = cur + src.getEnergyStored()
+        elseif t:match('^ic2_te_[a-z_]') then -- ic2 devices
+            max = max + src.getCapacity()
+            cur = cur + src.getEnergy()
+        end
+    end
+    histogram.values[#histogram.values + 1] = cur / max
     return histogram
 end
 
 local function loop(container)
     container.payload = updateHistogram(container.payload)
-    -- container:draw()
-    print('loop')
+    container:draw()
 end
 
 
@@ -119,7 +130,7 @@ local function main()
         loop(container)
         local _,_,k = event.pull(LOOP_DELAY, 'key_down')
         if k == 113 then -- if q is pressed
-            break        -- then leave the loop
+            -- break        -- then leave the loop
         end
     end
 end
