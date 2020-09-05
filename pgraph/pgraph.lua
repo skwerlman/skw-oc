@@ -1,6 +1,7 @@
 print('TEST VERSION')
 
 local component = require 'component'
+local event = require 'event'
 
 local charts = require 'charts'
 
@@ -92,7 +93,7 @@ local function buildHistogram(cells)
     return histogram
 end
 
-local function updateHistogram(histogram, max)
+local function updateHistogram(histogram, lim)
     local max, cur = 0, 0
     local values = histogram.values
     for _,src in ipairs(histogram.sources) do
@@ -105,8 +106,8 @@ local function updateHistogram(histogram, max)
             cur = cur + src.getEnergy()
         end
     end
-    values[values + 1] = cur / max
-    while #values > max then
+    values[#values + 1] = cur / max
+    if #values > lim then
         table.remove(values, 1)
     end
     histogram.values = values
