@@ -100,7 +100,6 @@ local function loop(container)
     container.payload = updateHistogram(container.payload)
     -- container:draw()
     print('loop')
-    event.timer(LOOP_DELAY, loop)
 end
 
 
@@ -116,8 +115,13 @@ local function main()
     print('building histogram...')
     container.payload = buildHistogram()
     print('starting main loop...')
-    loop(container)
-    -- while true do end
+    while true do
+        loop(container)
+        local _,_,k = event.pull(LOOP_DELAY, 'key_down')
+        if k == 113 then -- if q is pressed
+            break        -- then leave the loop
+        end
+    end
 end
 
 main()
