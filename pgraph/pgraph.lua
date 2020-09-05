@@ -17,7 +17,7 @@ local charts = require 'charts'
 
 local FG_COLOR = 0xFFFFFF
 local BG_COLOR = 0x000000
-local LOOP_DELAY = 1
+local LOOP_DELAY = .35
 
 -- [[ END SETTINGS ]] --
 
@@ -92,8 +92,9 @@ local function buildHistogram(cells)
     return histogram
 end
 
-local function updateHistogram(histogram)
+local function updateHistogram(histogram, max)
     local max, cur = 0, 0
+    local values = histogram.values
     for _,src in ipairs(histogram.sources) do
         local t = src.type
         if t == 'energy_device' or t == 'basic_energy_cube' then
@@ -104,12 +105,16 @@ local function updateHistogram(histogram)
             cur = cur + src.getEnergy()
         end
     end
-    histogram.values[#histogram.values + 1] = cur / max
+    values[values + 1] = cur / max
+    while #values > max then
+        table.remove(values, 1)
+    end
+    histogram.values = values
     return histogram
 end
 
 local function loop(container)
-    container.payload = updateHistogram(container.payload)
+    container.payload = updateHistogram(container.payload, container.width)
     container:draw()
 end
 
@@ -117,20 +122,19 @@ end
 local function main()
     print('initializing...')
     local gpu = component.gpu
-    local screen = component.screen
     print('getting list of cells...')
     local cells = getCells()
     print('found '..tostring(tSize(cells))..' cells')
     print('building container...')
-    local container = buildContainer(gpu, screen)
+    local container = buildContainer(gpu)
     print('building histogram...')
-    container.payload = buildHistogram()
+    container.payload = buildHistogram(cells)
     print('starting main loop...')
     while true do
         loop(container)
         local _,_,k = event.pull(LOOP_DELAY, 'key_down')
         if k == 113 then -- if q is pressed
-            -- break        -- then leave the loop
+            break        -- then leave the loop
         end
     end
 end
