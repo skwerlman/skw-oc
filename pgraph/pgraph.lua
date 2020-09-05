@@ -14,17 +14,21 @@ local charts = require 'charts'
 ]]--
 
 -- join lists of cells
-local function joinLists(lists) do
+local function joinLists(lists)
     local joined = {}
     for _,list in ipairs(lists) do
-        for _,item in ipairs(list) do
-            table.insert(joined, item)
+        for k,v in pairs(list) do
+            if type(k) == 'number' then
+                table.insert(joined, v)
+            else
+                joined[k] = v
+            end
         end
     end
     return joined
 end
 
-local function tSize(t) do
+local function tSize(t)
     local c = 0
     for _ in pairs(t) do
         c = c + 1
@@ -32,7 +36,7 @@ local function tSize(t) do
     return c
 end
 
-local function getCells() do
+local function getCells()
     return joinLists({
         -- rf-based cells (te, eio, rs)
         component.list('energy_device'),
@@ -53,7 +57,7 @@ local function getCells() do
     })
 end
 
-local function main() do
+local function main()
     print('initializing...')
     local gpu = component.gpu
     print('getting list of cells...')
