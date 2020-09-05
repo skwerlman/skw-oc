@@ -37,7 +37,7 @@ local function tSize(t)
 end
 
 local function getCells()
-    return joinLists({
+    local cells = joinLists({
         -- rf-based cells (te, eio, rs)
         component.list('energy_device'),
 
@@ -55,6 +55,11 @@ local function getCells()
         component.list('ic2_te_chargepad_mfe'),
         component.list('ic2_te_chargepad_mfsu'),
     })
+    local proxiedCells = {}
+    for addr in pairs(cells) do
+        table.insert(proxiedCells, component.proxy(addr))
+    end
+    return proxiedCells
 end
 
 local function main()
