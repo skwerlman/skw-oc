@@ -17,6 +17,7 @@ local charts = require 'charts'
 
 local FG_COLOR = 0xFFFFFF
 local BG_COLOR = 0x000000
+local LOOP_DELAY = 1
 
 -- [[ END SETTINGS ]] --
 
