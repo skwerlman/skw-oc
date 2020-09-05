@@ -4,8 +4,8 @@ local component = require 'component'
 
 local charts = require 'charts'
 
--- currently supports (at least) the following:
 --[[
+    currently supports (at least) the following:
     thermal expansion
     enderio
     ic2
@@ -22,6 +22,14 @@ local function joinLists(lists) do
         end
     end
     return joined
+end
+
+local function tSize(t) do
+    local c = 0
+    for _ in pairs(t) do
+        c = c + 1
+    end
+    return c
 end
 
 local function getCells() do
@@ -50,7 +58,7 @@ local function main() do
     local gpu = component.gpu
     print('getting list of cells...')
     local cells = getCells()
-    print('found '..tostring(string.len(cells))..' cells')
+    print('found '..tostring(tSize(cells))..' cells')
 end
 
 main()
