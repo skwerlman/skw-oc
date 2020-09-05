@@ -25,7 +25,7 @@ local function joinLists(lists) do
 end
 
 local function getCells() do
-    return joinLists([
+    return joinLists({
         -- rf-based cells (te, eio, rs)
         component.list('energy_device'),
 
@@ -42,7 +42,7 @@ local function getCells() do
         component.list('ic2_te_chargepad_cesu'),
         component.list('ic2_te_chargepad_mfe'),
         component.list('ic2_te_chargepad_mfsu'),
-    ])
+    })
 end
 
 local function main() do
